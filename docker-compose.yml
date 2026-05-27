@@ -1,0 +1,32 @@
+services:
+  gateway:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+
+  frontend:
+    image: hashicorp/http-echo:latest
+    command:
+      - "-text=<html>\n<head>\n  <title>Argus GitOps Sandbox</title>\n  <style>\n    body { background-color: #2ecc71; color: white; font-family: sans-serif; text-align: center; padding-top: 10%; }\n    h1 { font-size: 50px; }\n    .version { font-size: 24px; background: rgba(0,0,0,0.2); padding: 10px; display: inline-block; border-radius: 5px; }\n  </style>\n</head>\n<body>\n  <h1>Argus-CD Ecosystem Live! 🚀</h1>\n  <div class='version'>Application Version: v1.0.0 (Green Stable)</div>\n</body>\n</html>"
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "5678"]
+      interval: 3s
+      timeout: 2s
+      retries: 2
+
+  backend:
+    image: hashicorp/http-echo:latest
+    command:
+      - '-text={"status":"OK","version":"1.0.0"}'
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "5678"]
+      interval: 3s
+      timeout: 2s
+      retries: 2
