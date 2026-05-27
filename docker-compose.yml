@@ -1,10 +1,30 @@
+configs:
+  nginx_conf:
+    content: |
+      events {}
+
+      http {
+          server {
+              listen 80;
+
+              location / {
+                  proxy_pass http://frontend:5678;
+              }
+
+              location /health {
+                  proxy_pass http://backend:5678;
+              }
+          }
+      }
+
 services:
   gateway:
     image: nginx:alpine
     ports:
       - "8080:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    configs:
+      - source: nginx_conf
+        target: /etc/nginx/nginx.conf
     depends_on:
       - frontend
       - backend
