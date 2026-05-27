@@ -21,7 +21,7 @@ services:
   gateway:
     image: nginx:alpine
     ports:
-      - "8080:80"
+      - "9999:80"
     configs:
       - source: nginx_conf
         target: /etc/nginx/nginx.conf
